@@ -1,3 +1,9 @@
 {
-  "extends": "next/core-web-vitals"
+  "root": true,
+  "extends": [
+    "next/core-web-vitals",
+    "standard",
+    "standard-jsx",
+    "plugin:tailwindcss/recommended"
+  ]
 }

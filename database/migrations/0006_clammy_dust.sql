@@ -1,0 +1,1 @@
+ALTER TABLE "ironclad_skill" ADD CONSTRAINT "ironclad_skill_id_skill_unique" UNIQUE("id","skill");
