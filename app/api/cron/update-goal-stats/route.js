@@ -73,7 +73,7 @@ const mergeGoalsAndAccounts = (goals, accounts) => (
   })
 )
 
-export const POST = async () => {
+export const GET = async () => {
   const currentGoals = await getCurrentGoals()
 
   if (!currentGoals.length) {
