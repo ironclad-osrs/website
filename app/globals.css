@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --chart-stroke: theme("textColor.secondary.faint");
+  --chart-gradient-start: theme("textColor.secondary.DEFAULT");
+  --chart-gradient-end: theme("textColor.secondary.faint");
+}
+
+@layer base {
+  html,
+  body {
+    @apply selection:bg-secondary-faint selection:text-secondary;
+
+    height: theme("height.full");
+    background-color: theme("backgroundColor.primary.DEFAULT");
+    color: theme("textColor.primary.DEFAULT");
+    overflow: auto;
+  }
+}
