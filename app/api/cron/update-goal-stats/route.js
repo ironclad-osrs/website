@@ -75,6 +75,11 @@ const mergeGoalsAndAccounts = (goals, accounts) => (
 
 export const POST = async () => {
   const currentGoals = await getCurrentGoals()
+
+  if (!currentGoals.length) {
+    return new Response(null, { status: 202 })
+  }
+
   const accounts = await getAccountsForGoalEntries(currentGoals)
   const mapped = mergeGoalsAndAccounts(currentGoals, accounts)
 
@@ -108,5 +113,5 @@ export const POST = async () => {
       .where(eq(goals.id, goal.id))
   }))
 
-  return new Response(JSON.stringify(mapped), { status: 202 })
+  return new Response(null, { status: 202 })
 }
