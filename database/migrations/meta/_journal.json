@@ -5,57 +5,22 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1713026276890,
-      "tag": "0000_oval_sasquatch",
+      "when": 1714209891189,
+      "tag": "0000_melodic_reptil",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "5",
-      "when": 1713082745910,
-      "tag": "0001_ordinary_stingray",
+      "when": 1714213544299,
+      "tag": "0001_warm_raza",
       "breakpoints": true
     },
     {
       "idx": 2,
       "version": "5",
-      "when": 1713082774664,
-      "tag": "0002_fluffy_colonel_america",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1713088899964,
-      "tag": "0003_damp_skrulls",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1713090984423,
-      "tag": "0004_sloppy_scream",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1713091966986,
-      "tag": "0005_flawless_rhino",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1713092540454,
-      "tag": "0006_clammy_dust",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1713093270884,
-      "tag": "0007_tiresome_ezekiel",
+      "when": 1714221294765,
+      "tag": "0002_late_wallflower",
       "breakpoints": true
     }
   ]

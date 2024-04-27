@@ -33,13 +33,13 @@ export const skills = pgTable(
   'skill',
   {
     id: serial('id').primaryKey(),
-    oldschool_account_id: serial('oldschool_account_id').notNull(),
+    account_id: serial('account_id').notNull(),
     skill: skillEnum('skill').notNull(),
     xp: integer('xp').default(0),
     created_at: timestamp('created_at', { mode: 'date' }).defaultNow(),
     updated_at: timestamp('updated_at', { mode: 'date' })
   },
   (t) => ({
-    idx_oldschool_account_id_skill: unique().on(t.oldschool_account_id, t.skill)
+    idx_account_id_skill: unique().on(t.account_id, t.skill)
   })
 )

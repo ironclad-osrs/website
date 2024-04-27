@@ -1,1 +1,0 @@
-ALTER TABLE "ironclad_oldschool_account" ADD CONSTRAINT "ironclad_oldschool_account_user_id_account_hash_unique" UNIQUE("user_id","account_hash");

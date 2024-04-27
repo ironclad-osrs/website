@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import * as yup from 'yup'
 
 import { database } from '@/services/database'
-import { oldschoolAccounts } from '@/database/schema'
+import { accounts } from '@/database/schema'
 
 import { getUserFromApiKey } from '@/actions/get-user-from-api-key'
 
@@ -11,12 +11,14 @@ const schema = yup.object({
   character_name: yup.string()
 })
 
+export const dynamic = 'force-dynamic'
+
 export const PUT = async (request) => {
   try {
     const validated = await schema.validate(await request.json())
     const user = await getUserFromApiKey(request)
 
-    await database.insert(oldschoolAccounts)
+    await database.insert(accounts)
       .values({
         user_id: user.id,
         account_hash: validated.account_hash,
@@ -24,8 +26,8 @@ export const PUT = async (request) => {
       })
       .onConflictDoUpdate({
         target: [
-          oldschoolAccounts.user_id,
-          oldschoolAccounts.account_hash
+          accounts.user_id,
+          accounts.account_hash
         ],
         set: {
           character_name: validated.character_name,

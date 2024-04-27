@@ -1,13 +1,26 @@
 import { NextResponse } from 'next/server'
 import { eq } from 'drizzle-orm'
 
-import { auth } from '@/auth'
+import { verifyKey } from 'discord-interactions'
+
 import { database } from '@/services/database'
 import { apiKeys } from '@/database/schema'
 
-export const middleware = auth(async req => {
+export const middleware = async req => {
   const pathname = req.nextUrl.pathname
 
+  if (pathname.startsWith('/api/cron')) {
+    const header = req.headers.get('authorization') ?? ''
+
+    if (header !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json(
+        { error: 'Unauthenticated.' },
+        { status: 401 }
+      )
+    }
+  }
+
+  // Authenticate with RuneLite API keys
   if (pathname.startsWith('/api/runelite')) {
     const header = req.headers.get('authorization') ?? ''
 
@@ -37,5 +50,26 @@ export const middleware = auth(async req => {
       .where(eq(apiKeys.id, apiKey.id))
   }
 
+  // Authenticate with Discord signatures
+  if (pathname.startsWith('/api/discord')) {
+    try {
+      const signature = req.headers.get('x-signature-ed25519')
+      const timestamp = req.headers.get('x-signature-timestamp')
+      const isValidRequest = verifyKey(
+        await req.clone().text(), signature, timestamp,
+        process.env.DISCORD_BOT_PUBLIC_KEY
+      )
+
+      if (!isValidRequest) {
+        throw new Error('Invalid signature')
+      }
+    } catch (err) {
+      return NextResponse.json(
+        { error: 'Unauthenticated.' },
+        { status: 401 }
+      )
+    }
+  }
+
   return NextResponse.next()
-})
+}

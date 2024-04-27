@@ -6,7 +6,11 @@ import { DEVELOPMENT } from '@/utils/environment'
 
 const connectionString = process.env.DATABASE_URL
 
-const sql = neon(connectionString)
+const sql = neon(connectionString, {
+  fetchOptions: {
+    cache: 'no-cache'
+  }
+})
 
 export const database = drizzle(sql, {
   logger: DEVELOPMENT,

@@ -1,107 +1,9 @@
 {
-  "id": "f2a08e8c-f70c-44c6-937d-9ea84412d47d",
-  "prevId": "ea14172e-1d68-47bd-9fdc-f0c4cbc325ac",
+  "id": "75d1b134-f323-4557-bd14-bec50431b7cd",
+  "prevId": "9c1cecc2-5ec3-4b4a-9d35-902304509e0e",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "ironclad_account": {
-      "name": "ironclad_account",
-      "schema": "",
-      "columns": {
-        "userId": {
-          "name": "userId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "type": {
-          "name": "type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "provider": {
-          "name": "provider",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "providerAccountId": {
-          "name": "providerAccountId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "refresh_token": {
-          "name": "refresh_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "access_token": {
-          "name": "access_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "expires_at": {
-          "name": "expires_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "token_type": {
-          "name": "token_type",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "scope": {
-          "name": "scope",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "id_token": {
-          "name": "id_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "session_state": {
-          "name": "session_state",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "ironclad_account_userId_ironclad_user_id_fk": {
-          "name": "ironclad_account_userId_ironclad_user_id_fk",
-          "tableFrom": "ironclad_account",
-          "tableTo": "ironclad_user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "ironclad_account_provider_providerAccountId_pk": {
-          "name": "ironclad_account_provider_providerAccountId_pk",
-          "columns": [
-            "provider",
-            "providerAccountId"
-          ]
-        }
-      },
-      "uniqueConstraints": {}
-    },
     "ironclad_api_key": {
       "name": "ironclad_api_key",
       "schema": "",
@@ -114,7 +16,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -159,6 +61,25 @@
           "primaryKey": true,
           "notNull": true
         },
+        "uuid": {
+          "name": "uuid",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "gen_random_uuid()"
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "message_id": {
+          "name": "message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "skill": {
           "name": "skill",
           "type": "skill",
@@ -167,6 +88,13 @@
         },
         "progress": {
           "name": "progress",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "goal": {
+          "name": "goal",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
@@ -197,13 +125,45 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_uuid": {
+          "name": "idx_uuid",
+          "columns": [
+            "uuid"
+          ],
+          "isUnique": false
+        },
+        "idx_skill": {
+          "name": "idx_skill",
+          "columns": [
+            "skill"
+          ],
+          "isUnique": false
+        },
+        "idx_completed_at_archived_at": {
+          "name": "idx_completed_at_archived_at",
+          "columns": [
+            "completed_at",
+            "archived_at"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "idx_channel_id_message_id": {
+          "name": "idx_channel_id_message_id",
+          "nullsNotDistinct": false,
+          "columns": [
+            "channel_id",
+            "message_id"
+          ]
+        }
+      }
     },
-    "ironclad_oldschool_account": {
-      "name": "ironclad_oldschool_account",
+    "ironclad_account": {
+      "name": "ironclad_account",
       "schema": "",
       "columns": {
         "id": {
@@ -214,7 +174,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "text",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -253,7 +213,16 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "ironclad_account_user_id_account_hash_unique": {
+          "name": "ironclad_account_user_id_account_hash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id",
+            "account_hash"
+          ]
+        }
+      }
     },
     "ironclad_progress_entry": {
       "name": "ironclad_progress_entry",
@@ -265,9 +234,9 @@
           "primaryKey": true,
           "notNull": true
         },
-        "oldschool_account_id": {
-          "name": "oldschool_account_id",
-          "type": "text",
+        "account_id": {
+          "name": "account_id",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
@@ -308,47 +277,62 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "ironclad_session": {
-      "name": "ironclad_session",
+    "ironclad_skill": {
+      "name": "ironclad_skill",
       "schema": "",
       "columns": {
-        "sessionToken": {
-          "name": "sessionToken",
-          "type": "text",
+        "id": {
+          "name": "id",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "userId": {
-          "name": "userId",
-          "type": "text",
+        "account_id": {
+          "name": "account_id",
+          "type": "serial",
           "primaryKey": false,
           "notNull": true
         },
-        "expires": {
-          "name": "expires",
-          "type": "timestamp",
+        "skill": {
+          "name": "skill",
+          "type": "skill",
           "primaryKey": false,
           "notNull": true
+        },
+        "xp": {
+          "name": "xp",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "ironclad_session_userId_ironclad_user_id_fk": {
-          "name": "ironclad_session_userId_ironclad_user_id_fk",
-          "tableFrom": "ironclad_session",
-          "tableTo": "ironclad_user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "ironclad_skill_account_id_skill_unique": {
+          "name": "ironclad_skill_account_id_skill_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "account_id",
+            "skill"
+          ]
+        }
+      }
     },
     "ironclad_user": {
       "name": "ironclad_user",
@@ -356,31 +340,38 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "serial",
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "email": {
-          "name": "email",
+        "discord_user_id": {
+          "name": "discord_user_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "emailVerified": {
-          "name": "emailVerified",
+        "discord_guild_id": {
+          "name": "discord_guild_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discord_nickname": {
+          "name": "discord_nickname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
-        "image": {
-          "name": "image",
-          "type": "text",
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         }
@@ -388,43 +379,16 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "ironclad_verification_token": {
-      "name": "ironclad_verification_token",
-      "schema": "",
-      "columns": {
-        "identifier": {
-          "name": "identifier",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "token": {
-          "name": "token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expires": {
-          "name": "expires",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {
-        "ironclad_verification_token_identifier_token_pk": {
-          "name": "ironclad_verification_token_identifier_token_pk",
+      "uniqueConstraints": {
+        "ironclad_user_discord_user_id_discord_guild_id_unique": {
+          "name": "ironclad_user_discord_user_id_discord_guild_id_unique",
+          "nullsNotDistinct": false,
           "columns": [
-            "identifier",
-            "token"
+            "discord_user_id",
+            "discord_guild_id"
           ]
         }
-      },
-      "uniqueConstraints": {}
+      }
     }
   },
   "enums": {

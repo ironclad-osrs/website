@@ -1,12 +1,12 @@
+import { NextResponse } from 'next/server'
+import { eq, sql } from 'drizzle-orm'
 import * as yup from 'yup'
 
 import { getUserFromApiKey } from '@/actions/get-user-from-api-key'
-
 import { skills as skillEnum } from '@/utils/skill'
+
 import { database } from '@/services/database'
-import { NextResponse } from 'next/server'
 import { goals, progressEntries, skills } from '@/database/schema'
-import { sql } from 'drizzle-orm'
 
 const schema = yup.object({
   account_hash: yup.string(),
@@ -14,12 +14,15 @@ const schema = yup.object({
   xp: yup.number()
 })
 
+export const dynamic = 'force-dynamic'
+
 export const PUT = async (request) => {
   try {
     const validated = await schema.validate(await request.json())
     const user = await getUserFromApiKey(request)
 
-    const owned = await database.query.oldschoolAccounts.findFirst({
+    // Check that account is owned by current API key
+    const owned = await database.query.accounts.findFirst({
       where: (account, { and, eq, isNull }) => and(
         eq(account.user_id, user.id),
         isNull(account.archived_at)
@@ -30,22 +33,23 @@ export const PUT = async (request) => {
       throw new Error('Account not found.')
     }
 
+    // Get skills for current user
     const [existing, updated] = await database.batch([
       database.query.skills.findFirst({
         where: (skill, { and, eq }) => and(
-          eq(skill.oldschool_account_id, owned.id),
+          eq(skill.account_id, owned.id),
           eq(skill.skill, validated.skill)
         )
       }),
       database.insert(skills)
         .values({
-          oldschool_account_id: owned.id,
+          account_id: owned.id,
           skill: validated.skill,
           xp: validated.xp
         })
         .onConflictDoUpdate({
           target: [
-            skills.oldschool_account_id,
+            skills.account_id,
             skills.skill
           ],
           set: {
@@ -63,7 +67,8 @@ export const PUT = async (request) => {
         return new Response(null, { status: 202 })
       }
 
-      const goal = await database.query.goals.findFirst({
+      // Find goal
+      let goal = await database.query.goals.findFirst({
         where: (goal, { and, eq, isNull }) => and(
           eq(goal.skill, validated.skill),
           isNull(goal.archived_at),
@@ -75,19 +80,31 @@ export const PUT = async (request) => {
         return new Response(null, { status: 202 })
       }
 
-      await database.batch([
-        await database.insert(progressEntries)
+      // Create progress entry and update goal
+      const [, updatedGoals] = await database.batch([
+        database.insert(progressEntries)
           .values({
-            oldschool_account_id: owned.id,
+            account_id: owned.id,
             goal_id: goal.id,
             entry: diff
           }),
-        await database.update(goals)
+        database.update(goals)
           .set({
             progress: sql`${goals.progress} + ${diff}`,
             updated_at: new Date()
           })
+          .where(eq(goals.id, goal.id))
+          .returning()
       ])
+
+      goal = updatedGoals[0]
+
+      // Flag as complete
+      if (goal.progress >= goal.goal) {
+        await database.update(goals)
+          .set({ completed_at: new Date() })
+          .where(eq(goals.id, goal.id))
+      }
     }
 
     return new Response(null, { status: 202 })

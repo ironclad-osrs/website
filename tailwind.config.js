@@ -1,6 +1,7 @@
 const theme = require('tailwindcss/defaultTheme.js')
 const colors = require('tailwindcss/colors.js')
 
+const body = colors.white
 const primary = colors.stone
 const secondary = colors.orange
 
@@ -19,40 +20,40 @@ module.exports = {
       },
       textColor: {
         primary: {
-          louder: primary[100],
-          loud: primary[300],
-          DEFAULT: primary[500],
-          muted: primary[600],
-          faint: primary[700]
+          louder: primary[900],
+          loud: primary[800],
+          DEFAULT: primary[600],
+          muted: primary[500],
+          faint: primary[400]
         },
         secondary: {
-          louder: secondary[100],
-          loud: secondary[300],
-          DEFAULT: secondary[500],
-          muted: secondary[600],
-          faint: secondary[700]
+          louder: secondary[900],
+          loud: secondary[800],
+          DEFAULT: secondary[600],
+          muted: secondary[500],
+          faint: secondary[400]
         }
       },
       backgroundColor: {
         primary: {
-          DEFAULT: primary[950],
-          muted: primary[800],
-          faint: primary[900]
+          DEFAULT: body,
+          muted: primary[100],
+          faint: primary[50]
         },
         secondary: {
-          DEFAULT: secondary[950],
-          muted: secondary[800],
-          faint: secondary[900]
+          DEFAULT: body,
+          muted: secondary[100],
+          faint: secondary[50]
         }
       },
       borderColor: {
         primary: {
-          DEFAULT: primary[900]
+          DEFAULT: primary[200]
         }
       },
       ringColor: {
         primary: {
-          DEFAULT: primary[900]
+          DEFAULT: primary[200]
         }
       },
       fontFamily: {
