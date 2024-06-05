@@ -111,6 +111,8 @@ export const GET = async () => {
     messagesToCreate.map((goal, index) => {
       const msg = newMessages[index]
 
+      console.debug(JSON.stringify(msg))
+
       return d.update(goals)
         .set({ message_id: msg.id })
         .where(eq(goals.id, goal.id))
