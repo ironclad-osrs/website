@@ -1,18 +1,40 @@
-import { neon } from '@neondatabase/serverless'
-import { drizzle } from 'drizzle-orm/neon-http'
-
 import * as schema from '@/database/schema'
-import { DEVELOPMENT } from '@/utils/environment'
+import { DEVELOPMENT, TEST } from '@/utils/environment'
 
-const connectionString = process.env.DATABASE_URL
+export const database = async () => {
+  const connectionString = process.env.DATABASE_URL
 
-const sql = neon(connectionString, {
-  fetchOptions: {
-    cache: 'no-cache'
+  if (TEST) {
+    const p = await import('pg')
+    const d = await import('drizzle-orm/node-postgres')
+
+    const sql = new p.Client({
+      connectionString
+    })
+
+    await sql.connect()
+
+    const instance = d.drizzle(sql, { schema })
+
+    // Note:
+    // Patch fake batch function for
+    // during integration tests.
+    instance.batch = async queries => await Promise.all(queries)
+
+    return instance
   }
-})
 
-export const database = drizzle(sql, {
-  logger: DEVELOPMENT,
-  schema
-})
+  const n = await import('@neondatabase/serverless')
+  const d = await import('drizzle-orm/neon-http')
+
+  const sql = n.neon(connectionString, {
+    fetchOptions: {
+      cache: 'no-cache'
+    }
+  })
+
+  return d.drizzle(sql, {
+    logger: DEVELOPMENT,
+    schema
+  })
+}

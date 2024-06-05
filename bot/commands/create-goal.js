@@ -4,8 +4,14 @@ export const createGoal = new SlashCommandBuilder()
   .setName('create-goal')
   .setDescription('Create a clan goal')
   .addStringOption(option => (
-    option.setName('target_skill').setDescription('The target skill to train')
+    option
+      .setName('target_skill')
+      .setDescription('The target skill to train')
+      .setRequired(true)
   ))
   .addNumberOption(option => (
-    option.setName('xp_goal').setDescription('The XP goal to work towards')
+    option
+      .setName('xp_goal')
+      .setDescription('The XP goal to work towards')
+      .setRequired(true)
   ))

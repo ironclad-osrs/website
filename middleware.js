@@ -31,12 +31,14 @@ export const middleware = async req => {
       )
     }
 
-    const apiKey = await database.query.apiKeys.findFirst({
-      where: (apiKey, { and, eq, isNull }) => and(
-        eq(apiKey.key, header),
-        isNull(apiKey.archived_at)
-      )
-    })
+    const apiKey = await database().then(d => d.query.apiKeys
+      .findFirst({
+        where: (apiKey, { and, eq, isNull }) => and(
+          eq(apiKey.key, header),
+          isNull(apiKey.archived_at)
+        )
+      })
+    )
 
     if (!apiKey) {
       return NextResponse.json(
@@ -45,9 +47,10 @@ export const middleware = async req => {
       )
     }
 
-    await database.update(apiKeys)
+    await database().then(d => d.update(apiKeys)
       .set({ last_used_at: new Date() })
       .where(eq(apiKeys.id, apiKey.id))
+    )
   }
 
   // Authenticate with Discord signatures

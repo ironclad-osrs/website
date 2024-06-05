@@ -2,14 +2,14 @@ import { eq } from 'drizzle-orm'
 
 import { database } from '@/services/database'
 import { goals } from '@/database/schema'
-
-import { sendChannelMessage, updateChannelMessage } from '../_helpers'
 import { format } from '@/utils/number'
 
+import { sendChannelMessage, updateChannelMessage } from '../_helpers'
+
 const getCurrentGoals = async () => (
-  database.query.goals.findMany({
+  database().then(d => d.query.goals.findMany({
     where: (goal, { and, isNull }) => and(
-      // isNull(goal.completed_at),
+      isNull(goal.completed_at),
       isNull(goal.archived_at)
     ),
     with: {
@@ -20,7 +20,7 @@ const getCurrentGoals = async () => (
         }
       }
     }
-  })
+  }))
 )
 
 const getAccountsForGoalEntries = async goals => {
@@ -35,13 +35,15 @@ const getAccountsForGoalEntries = async goals => {
   }
 
   // Get accounts for those account IDs
-  const accounts = await database.query.accounts.findMany({
-    where: (account, { inArray }) => inArray(account.id, accountIds),
-    columns: {
-      id: true,
-      character_name: true
-    }
-  })
+  const accounts = await database().then(d => d.query.accounts
+    .findMany({
+      where: (account, { inArray }) => inArray(account.id, accountIds),
+      columns: {
+        id: true,
+        character_name: true
+      }
+    })
+  )
 
   return accounts
 }
@@ -98,20 +100,22 @@ export const GET = async () => {
 
   const newMessages = await Promise.all([
     ...messagesToCreate.map(goal => (
-      sendChannelMessage(makeStats(goal))
+      sendChannelMessage(goal.channel_id, makeStats(goal))
     )),
     ...messagesToUpdate.map(goal => updateChannelMessage(
-      goal.message_id, makeStats(goal)
+      goal.channel_id, goal.message_id, makeStats(goal)
     ))
   ])
 
-  await database.batch(messagesToCreate.map((goal, index) => {
-    const msg = newMessages[index]
+  await database().then(d => d.batch(
+    messagesToCreate.map((goal, index) => {
+      const msg = newMessages[index]
 
-    return database.update(goals)
-      .set({ message_id: msg.id, channel_id: msg.channel_id })
-      .where(eq(goals.id, goal.id))
-  }))
+      return d.update(goals)
+        .set({ message_id: msg.id })
+        .where(eq(goals.id, goal.id))
+    }))
+  )
 
   return new Response(null, { status: 202 })
 }

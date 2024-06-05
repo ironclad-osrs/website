@@ -18,7 +18,7 @@ export const PUT = async (request) => {
     const validated = await schema.validate(await request.json())
     const user = await getUserFromApiKey(request)
 
-    await database.insert(accounts)
+    await database().then(d => d.insert(accounts)
       .values({
         user_id: user.id,
         account_hash: validated.account_hash,
@@ -34,6 +34,7 @@ export const PUT = async (request) => {
           updated_at: new Date()
         }
       })
+    )
 
     return new Response(null, { status: 204 })
   } catch (err) {

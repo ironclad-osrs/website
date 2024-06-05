@@ -1,10 +1,10 @@
 import { database } from '@/services/database'
 import { goals, skillEnum } from '@/database/schema'
 
-import { returnFirst } from '@/utils/return-first'
 import { format } from '@/utils/number'
 
 import {
+  getChannelIdFromInteraction,
   getInteractionOptions,
   sendPrivateChannelMessage
 } from './_helpers'
@@ -28,13 +28,15 @@ const handle = async interaction => {
     )
   }
 
-  const existing = await database.query.goals.findFirst({
-    where: (goal, { and, eq, isNull }) => and(
-      eq(goal.skill, options.target_skill),
-      isNull(goal.archived_at),
-      isNull(goal.completed_at)
-    )
-  })
+  const existing = await database().then(d => d.query.goals
+    .findFirst({
+      where: (goal, { and, eq, isNull }) => and(
+        eq(goal.skill, options.target_skill),
+        isNull(goal.archived_at),
+        isNull(goal.completed_at)
+      )
+    })
+  )
 
   if (existing) {
     return sendPrivateChannelMessage(
@@ -42,13 +44,15 @@ const handle = async interaction => {
     )
   }
 
-  const goal = await returnFirst(
-    database.insert(goals)
+  const goal = await database().then(d => (
+    d.insert(goals)
       .values({
         skill: options.target_skill,
-        goal: options.xp_goal
+        goal: options.xp_goal,
+        channel_id: getChannelIdFromInteraction(interaction)
       })
-  )
+      .returning()
+  )).then(r => r[0])
 
   return sendPrivateChannelMessage(
     `A goal has been created for ${goal.skill} with the target of ${format(goal.goal)} xp:\n${goal.uuid}`

@@ -1,6 +1,4 @@
-import { channelId } from './_constants'
-
-export const sendChannelMessage = async message => {
+export const sendChannelMessage = async (channelId, message) => {
   const uri = new URL(
     `channels/${channelId}/messages`,
     process.env.DISCORD_API_URI
@@ -21,10 +19,10 @@ export const sendChannelMessage = async message => {
   return res.json()
 }
 
-export const updateChannelMessage = async (messageId, message) => {
+export const updateChannelMessage = async (channelId, messageId, message) => {
   const uri = new URL(
-      `channels/${channelId}/messages/${messageId}`,
-      process.env.DISCORD_API_URI
+    `channels/${channelId}/messages/${messageId}`,
+    process.env.DISCORD_API_URI
   )
 
   const res = await fetch(uri, {

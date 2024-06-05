@@ -27,6 +27,10 @@ export const getGuildIdFromInteraction = interaction => (
   interaction.guild.id
 )
 
+export const getChannelIdFromInteraction = interaction => (
+  interaction.channel_id
+)
+
 export const getInteractionOptions = interaction => {
   if (!interaction.data.options) {
     return {}

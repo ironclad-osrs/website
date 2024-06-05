@@ -3,7 +3,6 @@ import { eq } from 'drizzle-orm'
 
 import { database } from '@/services/database'
 import { apiKeys, users } from '@/database/schema'
-import { returnFirst } from '@/utils/return-first'
 
 import {
   getDisplayNameFromInteraction,
@@ -19,46 +18,51 @@ const handle = async interaction => {
   const userId = getUserIdFromInteraction(interaction)
   const guildId = getGuildIdFromInteraction(interaction)
 
-  let user = await database.query.users
+  let user = await database().then(d => d.query.users
     .findFirst({
       where: (user, { and, eq }) => and(
         eq(user.discord_user_id, userId),
         eq(user.discord_guild_id, guildId)
       )
     })
+  )
 
   if (!user) {
-    user = await returnFirst(
-      database.insert(users)
+    user = await database().then(d => (
+      d.insert(users)
         .values({
           discord_user_id: userId,
           discord_guild_id: guildId,
           discord_nickname: name
         })
-    )
+        .returning()
+    )).then(r => r[0])
   }
 
-  let apiKey = await database.query.apiKeys
+  let apiKey = await database().then(d => d.query.apiKeys
     .findFirst({
       where: (apiKey, { and, eq, isNull }) => and(
         eq(apiKey.user_id, user.id),
         isNull(apiKey.archived_at)
       )
     })
+  )
 
   if (!apiKey) {
-    apiKey = await returnFirst(
-      database.insert(apiKeys)
+    apiKey = await database().then(d => (
+      d.insert(apiKeys)
         .values({
           user_id: user.id,
           key: uid(20)
         })
-    )
+        .returning()
+    )).then(r => r[0])
   }
 
-  await database.update(apiKeys)
+  await database().then(d => d.update(apiKeys)
     .set({ last_used_at: new Date() })
     .where(eq(apiKeys.id, apiKey.id))
+  )
 
   return sendPrivateChannelMessage(`Hey ${name}, your API key is:\n${apiKey.key}`)
 }
