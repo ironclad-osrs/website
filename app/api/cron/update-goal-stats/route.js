@@ -38,9 +38,11 @@ const getAccountsForGoalEntries = async goals => {
   const accounts = await database().then(d => d.query.accounts
     .findMany({
       where: (account, { inArray }) => inArray(account.id, accountIds),
-      columns: {
-        id: true,
-        character_name: true
+      columns: { id: true },
+      with: {
+        user: {
+          discord_nickname: true
+        }
       }
     })
   )
@@ -69,7 +71,7 @@ const mergeGoalsAndAccounts = (goals, accounts) => (
       entries: entries.reduce((acc, [accountId, contribution]) => {
         const account = accounts.find(account => account.id === Number(accountId))
 
-        return [...acc, { name: account?.character_name, contribution }]
+        return [...acc, { name: account?.user?.discord_nickname, contribution }]
       }, [])
     }
   })
@@ -80,6 +82,7 @@ export const GET = async () => {
 
   if (!currentGoals.length) {
     console.log('update-goal-stats: no goals to update')
+
     return new Response(null, { status: 202 })
   }
 
@@ -107,8 +110,6 @@ export const GET = async () => {
       goal.channel_id, goal.message_id, makeStats(goal)
     ))
   ])
-
-  console.log(JSON.stringify(newMessages))
 
   await database().then(d => d.batch(
     messagesToCreate.map((goal, index) => {

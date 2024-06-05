@@ -1,6 +1,8 @@
+import { relations } from 'drizzle-orm'
 import { serial, text, timestamp, unique } from 'drizzle-orm/pg-core'
 
 import { pgTable } from '../helpers'
+import { users } from './user'
 
 export const accounts = pgTable(
   'account',
@@ -17,3 +19,10 @@ export const accounts = pgTable(
     idx_user_id_account_hash: unique().on(t.user_id, t.account_hash)
   })
 )
+
+export const accountRelations = relations(accounts, ({ one }) => ({
+  user: one(users, {
+    fields: [accounts.user_id],
+    references: [users.id]
+  })
+}))
