@@ -79,6 +79,7 @@ export const GET = async () => {
   const currentGoals = await getCurrentGoals()
 
   if (!currentGoals.length) {
+    console.log('update-goal-stats: no goals to update')
     return new Response(null, { status: 202 })
   }
 
@@ -107,11 +108,11 @@ export const GET = async () => {
     ))
   ])
 
+  console.log(JSON.stringify(newMessages))
+
   await database().then(d => d.batch(
     messagesToCreate.map((goal, index) => {
       const msg = newMessages[index]
-
-      console.debug(JSON.stringify(msg))
 
       return d.update(goals)
         .set({ message_id: msg.id })
