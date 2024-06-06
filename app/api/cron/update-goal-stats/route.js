@@ -9,7 +9,6 @@ import { sendChannelMessage, updateChannelMessage } from '../_helpers'
 const getCurrentGoals = async () => (
   database().then(d => d.query.goals.findMany({
     where: (goal, { and, isNull, gt, or }) => and(
-      isNull(goal.completed_at),
       isNull(goal.archived_at),
       or(
         isNull(goal.last_broadcasted_at),
