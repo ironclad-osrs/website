@@ -1,0 +1,1 @@
+ALTER TABLE "ironclad_goal" ADD COLUMN "last_broadcasted_at" timestamp;

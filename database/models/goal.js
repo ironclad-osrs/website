@@ -18,6 +18,7 @@ export const goals = pgTable(
     goal: integer('goal').notNull(),
     created_at: timestamp('created_at', { mode: 'date' }).defaultNow(),
     updated_at: timestamp('updated_at', { mode: 'date' }),
+    last_broadcasted_at: timestamp('last_broadcasted_at', { mode: 'date' }),
     completed_at: timestamp('completed_at', { mode: 'date' }),
     archived_at: timestamp('archived_at', { mode: 'date' })
   },

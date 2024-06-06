@@ -8,9 +8,13 @@ import { sendChannelMessage, updateChannelMessage } from '../_helpers'
 
 const getCurrentGoals = async () => (
   database().then(d => d.query.goals.findMany({
-    where: (goal, { and, isNull }) => and(
+    where: (goal, { and, isNull, gt, or }) => and(
       isNull(goal.completed_at),
-      isNull(goal.archived_at)
+      isNull(goal.archived_at),
+      or(
+        isNull(goal.last_broadcasted_at),
+        gt(goal.updated_at, goal.last_broadcasted_at)
+      )
     ),
     with: {
       entries: {
@@ -111,15 +115,20 @@ export const GET = async () => {
     ))
   ])
 
-  await database().then(d => d.batch(
-    messagesToCreate.map((goal, index) => {
+  await database().then(d => d.batch([
+    ...messagesToCreate.map((goal, index) => {
       const msg = newMessages[index]
 
       return d.update(goals)
-        .set({ message_id: msg.id })
+        .set({ message_id: msg.id, last_broadcasted_at: new Date() })
         .where(eq(goals.id, goal.id))
-    }))
-  )
+    }),
+    ...messagesToUpdate.map(goal => (
+      d.update(goals)
+        .set({ last_broadcasted_at: new Date() })
+        .where(eq(goals.id, goal.id))
+    ))
+  ]))
 
   return new Response(null, { status: 202 })
 }
