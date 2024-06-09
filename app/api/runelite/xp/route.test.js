@@ -476,5 +476,37 @@ describe('runelite:xp', () => {
         })
       })
     })
+
+    describe('with overflow completing progress, and non-complete goal', () => {
+      beforeEach(async () => {
+        const account = await $createAccount(apiKey.user_id)
+
+        await $createSkill(account.id, 'woodcutting', 1)
+        await $createGoal('woodcutting')
+      })
+
+      it('should complete the goal', async () => {
+        await testApiHandler({
+          appHandler: handle,
+          test: async ({ fetch }) => {
+            await fetch({
+              method: 'PUT',
+              headers: { authorization: apiKey.key },
+              body: JSON.stringify({
+                account_hash: 200,
+                skill: 'woodcutting',
+                xp: 250
+              })
+            })
+
+            const goal = await $findGoal(undefined, true)
+
+            expect(goal.progress).to.eql(200)
+            expect(goal.completed_at).not.toBeNull()
+            expect(goal.updated_at).not.toBeNull()
+          }
+        })
+      })
+    })
   })
 })

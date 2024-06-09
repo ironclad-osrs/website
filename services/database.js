@@ -1,8 +1,14 @@
 import * as schema from '@/database/schema'
 import { DEVELOPMENT, TEST } from '@/utils/environment'
 
+let client
+
 export const database = async () => {
   const connectionString = process.env.DATABASE_URL
+
+  if (client) {
+    return client
+  }
 
   if (TEST) {
     const p = await import('pg')
@@ -14,14 +20,14 @@ export const database = async () => {
 
     await sql.connect()
 
-    const instance = d.drizzle(sql, { schema })
+    client = d.drizzle(sql, { schema })
 
     // Note:
     // Patch fake batch function for
     // during integration tests.
-    instance.batch = async queries => await Promise.all(queries)
+    client.batch = async queries => await Promise.all(queries)
 
-    return instance
+    return client
   }
 
   const n = await import('@neondatabase/serverless')
@@ -33,8 +39,10 @@ export const database = async () => {
     }
   })
 
-  return d.drizzle(sql, {
+  client = d.drizzle(sql, {
     logger: DEVELOPMENT,
     schema
   })
+
+  return client
 }

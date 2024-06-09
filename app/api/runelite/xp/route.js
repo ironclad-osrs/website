@@ -84,17 +84,19 @@ export const PUT = async (request) => {
         return new Response(null, { status: 202 })
       }
 
+      const overflow = Math.min(goal.goal - goal.progress, diff)
+
       // Create progress entry and update goal
       const [, updatedGoals] = await database().then(d => d.batch([
         d.insert(progressEntries)
           .values({
             account_id: owned.id,
             goal_id: goal.id,
-            entry: diff
+            entry: overflow
           }),
         d.update(goals)
           .set({
-            progress: sql`${goals.progress} + ${diff}`,
+            progress: sql`${goals.progress} + ${overflow}`,
             updated_at: new Date()
           })
           .where(eq(goals.id, goal.id))
