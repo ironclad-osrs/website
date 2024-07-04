@@ -17,5 +17,9 @@ export const getUserFromApiKey = async (req) => {
     })
   )
 
+  if (!apiKey?.user) {
+    throw new Error('User not found.')
+  }
+
   return apiKey?.user
 }
