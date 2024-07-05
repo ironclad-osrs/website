@@ -1,18 +1,18 @@
 import { eq, sql } from 'drizzle-orm'
 
 import { database } from '@/services/database'
-import { goals, progressEntries, skills } from '@/database/schema'
+import { goals, progressEntries, accountSkills } from '@/database/schema'
 
 export const processXp = async (accountId, data) => {
   // Get skills for current user
   const [existing, updated] = await database().then(d => d.batch([
-    d.query.skills.findFirst({
+    d.query.accountSkills.findFirst({
       where: (skill, { and, eq }) => and(
         eq(skill.account_id, accountId),
         eq(skill.skill, data.skill)
       )
     }),
-    d.insert(skills)
+    d.insert(accountSkills)
       .values({
         account_id: accountId,
         skill: data.skill,
@@ -20,8 +20,8 @@ export const processXp = async (accountId, data) => {
       })
       .onConflictDoUpdate({
         target: [
-          skills.account_id,
-          skills.skill
+          accountSkills.account_id,
+          accountSkills.skill
         ],
         set: {
           xp: data.xp,

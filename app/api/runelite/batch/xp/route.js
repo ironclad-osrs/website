@@ -19,8 +19,6 @@ export const PUT = async (request) => {
     const validated = await schema.validate(await request.json())
     const account = await getAcccount(request, validated.account_hash)
 
-    console.log(JSON.stringify(validated, null, 2))
-
     for (let i = 0; i < validated.batch.length; i++) {
       await processXp(account.id, validated.batch[i])
     }

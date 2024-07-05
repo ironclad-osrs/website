@@ -29,8 +29,8 @@ export const skillEnum = pgEnum('skill', [
   'hunter'
 ])
 
-export const skills = pgTable(
-  'skill',
+export const accountSkills = pgTable(
+  'account_skill',
   {
     id: serial('id').primaryKey(),
     account_id: serial('account_id').notNull(),

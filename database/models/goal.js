@@ -3,7 +3,7 @@ import { relations, sql } from 'drizzle-orm'
 
 import { pgTable } from '../helpers'
 
-import { skillEnum } from './skill'
+import { skillEnum } from './account-skill'
 import { progressEntries } from './progress-entry'
 
 export const goals = pgTable(

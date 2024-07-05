@@ -9,7 +9,7 @@ import {
 } from 'vitest'
 
 import { database } from '@/services/database'
-import { accounts, goals, skills } from '@/database/schema'
+import { accounts, goals, accountSkills } from '@/database/schema'
 
 import {
   clearDatabase,
@@ -31,7 +31,7 @@ const $createAccount = async userId => (
 )
 
 const $findSkill = async skill => (
-  database().then(d => d.query.skills
+  database().then(d => d.query.accountSkills
     .findFirst({
       where: ($skill, { eq }) => eq(
         $skill.skill, skill
@@ -41,7 +41,7 @@ const $findSkill = async skill => (
 )
 
 const $createSkill = async (accountId, skill = 'woodcutting', xp = 200) => (
-  database().then(d => d.insert(skills)
+  database().then(d => d.insert(accountSkills)
     .values({
       account_id: accountId,
       skill,

@@ -29,6 +29,34 @@
       "when": 1717671142006,
       "tag": "0003_tan_smiling_tiger",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1720130074423,
+      "tag": "0004_lying_nemesis",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1720131266823,
+      "tag": "0005_gorgeous_lizard",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1720131328856,
+      "tag": "0006_sparkling_mattie_franklin",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1720166490236,
+      "tag": "0007_premium_banshee",
+      "breakpoints": true
     }
   ]
 }
