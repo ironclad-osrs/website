@@ -95,7 +95,10 @@ export const GET = async () => {
   const makeStats = goal => [
     `Contributions for ${goal.skill} (${format(goal.progress)}/${format(goal.goal)} xp)\n`,
     goal.entries.length
-      ? goal.entries.map(entry => `* ${entry.name}: ${entry.contribution} xp`).join('\n')
+      ? goal.entries
+        .sort((a, b) => b.contribution - a.contribution)
+        .map(entry => `* ${entry.name}: ${entry.contribution} xp`)
+        .join('\n')
       : '_No contributions yet_',
     goal.completed_at
       ? '\n\n_Goal completed!_'
